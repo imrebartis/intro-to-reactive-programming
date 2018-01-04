@@ -1,21 +1,19 @@
-console.clear();
+var button = document.querySelector('.button');
+var label = document.querySelector('h4');
 
-var source = ['1', '1', 'foo', '2', '3', '5', 'bar', '8', '13'];
+var clickStream = Rx.Observable.fromEvent(button, 'click');
 
-var result = source
-  .map(x => parseInt(x))
-  .filter(x => !isNaN(x))
-  .reduce((x, y) => x + y);
+var doubleClickStream = clickStream
+  .bufferWhen(() => clickStream.debounceTime(250))
+  .map(arr => arr.length)
+  .filter(len => len === 2);
 
-console.log(result) || displayInPreview(result);
+doubleClickStream.subscribe(event => {
+  label.textContent = 'double click';
+});
 
-
-
-
-// display in plunker preview
-function displayInPreview(string) {
-  var newDiv = document.createElement("div"); 
-  var newContent = document.createTextNode(string); 
-  newDiv.appendChild(newContent);
-  document.body.appendChild(newDiv)
-}
+doubleClickStream
+  .delay(1000)
+  .subscribe(suggestion => {
+    label.textContent = '-';
+  });
