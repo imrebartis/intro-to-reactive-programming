@@ -1,6 +1,11 @@
-console.clear();
+var requestStream = Rx.Observable.of('https://api.github.com/users');
 
-var streamA = Rx.Observable.of(3, 4, 5);
-var streamB = streamA.map(a => 10 * a);
+// flatMap is now an alias for mergeMap 
+// but will work just the same.
+var responseStream = requestStream
+  .flatMap(requestUrl =>
+    Rx.Observable.fromPromise(jQuery.getJSON(requestUrl))
+  );
 
-streamB.subscribe(b => console.log(b))
+responseStream.subscribe(response => {
+  console.log(response)});

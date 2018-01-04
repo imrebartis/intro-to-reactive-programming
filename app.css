@@ -2,19 +2,34 @@ body {
     font-family: sans-serif;
     padding: 10px;
 }
-.button {
-  background: #EcEcEc;
-  padding: 5px;
-  text-decoration: none;
-  color: black;
-  border: 1px solid darkgray;
-}
-h4 {
+h3 {
     font-weight: bold;
     display: inline-block;
-    margin-left: 20px;
+  padding: 0;
+  margin: 0;
+}
+.refresh {
+    font-size: 80%;
+    margin-left: 10px;
 }
 .header {
-    /*background: #ECECEC;
-    */padding: 5px;
+    background: #ECECEC;
+    padding: 5px;
+}
+.suggestions {
+    border: 2px solid #ECECEC;
+}
+li {
+    padding: 5px;
+}
+li img {
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+}
+li .username, li .close {
+    display: inline-block;
+    position: relative;
+    bottom: 15px;
+    left: 5px;
 }
