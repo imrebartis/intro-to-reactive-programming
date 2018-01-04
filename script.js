@@ -1,19 +1,6 @@
-var button = document.querySelector('.button');
-var label = document.querySelector('h4');
+console.clear();
 
-var clickStream = Rx.Observable.fromEvent(button, 'click');
+var streamA = Rx.Observable.of(3, 4, 5);
+var streamB = streamA.map(a => 10 * a);
 
-var doubleClickStream = clickStream
-  .bufferWhen(() => clickStream.debounceTime(250))
-  .map(arr => arr.length)
-  .filter(len => len === 2);
-
-doubleClickStream.subscribe(event => {
-  label.textContent = 'double click';
-});
-
-doubleClickStream
-  .delay(1000)
-  .subscribe(suggestion => {
-    label.textContent = '-';
-  });
+streamB.subscribe(b => console.log(b))
