@@ -2,37 +2,52 @@
 
 var refreshButton = document.querySelector('.refresh');
 
-var requestStream = Rx.Observable.just('https://api.github.com/users');
+// Represent clicks from the refresh link as an event stream
+var refreshClickStream = Rx.Observable.fromEvent(refreshButton, 'click');
 
-var responseStream = requestStream
+// Initializes our page with users
+var startupRequestStream = Rx.Observable.just('https://api.github.com/users');
+
+var requestOnRefreshStream = refreshClickStream
+  .map(ev => {
+    var randomOffset = Math.floor(Math.random()*500);
+    return 'https://api.github.com/users?since=' + randomOffset;
+  });
+
+// Works for initial request stream and refresh
+var responseStream = requestOnRefreshStream.merge(startupRequestStream)
   .flatMap(requestUrl =>
     Rx.Observable.fromPromise(jQuery.getJSON(requestUrl))
   );
 
-// Return a random user
 function createSuggestionStream(responseStream) {
   return responseStream.map(listUser =>
     listUser[Math.floor(Math.random()*listUser.length)]
-  );
+  )
+  .startWith(null)
+  .merge(refreshClickStream.map(ev => null));
 }
 
-// grab 3 users
 var suggestion1Stream = createSuggestionStream(responseStream);
 var suggestion2Stream = createSuggestionStream(responseStream);
 var suggestion3Stream = createSuggestionStream(responseStream);
 
-// Render output to the DOM
-function renderSuggestion(userData, selector) {
-  var element = document.querySelector(selector);
-  var usernameEl = element.querySelector('.username');
-  usernameEl.href = userData.html_url;
-  usernameEl.textContent = userData.login;
-  var imgEl = element.querySelector('img');
-  imgEl.src = userData.avatar_url;
+// Rendering ---------------------------------------------------
+function renderSuggestion(suggestedUser, selector) {
+  var suggestionEl = document.querySelector(selector);
+  if (suggestedUser === null) {
+    suggestionEl.style.visibility = 'hidden';
+  } else {
+    suggestionEl.style.visibility = 'visible';
+    var usernameEl = suggestionEl.querySelector('.username');
+    usernameEl.href = suggestedUser.html_url;
+    usernameEl.textContent = suggestedUser.login;
+    var imgEl = suggestionEl.querySelector('img');
+    imgEl.src = "";
+    imgEl.src = suggestedUser.avatar_url;
+  }
 }
 
-// Need to subscribe to event stream
-// and render out to the DOM
 suggestion1Stream.subscribe(user => {
   renderSuggestion(user, '.suggestion1');
 });
